@@ -1,0 +1,44 @@
+---
+title: "Litapallettur"
+author: "Hlynur Hallgrímsson"
+date: "20 desember 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, cache = TRUE)
+```
+
+## Hugmyndin
+
+Í þessu litlu R-kóðabók er notast við `kmeans` reiknirit til að búa til litapallettur út frá íslenskum myndum í von um að búa til litapallettur sem vekja upp hughrif um eitthvað *íslenskt* (án þess að velta sér sérstaklega upp úr því hvað það þýðir). Hugmyndin kemur úr tveimur mismunandi áttum. Annars vegar lestri á [bloggi R-notendahópsins í Mílanó](http://www.milanor.net/blog/build-color-palette-from-image-with-paletter/) þar sem notast er við `kmeans` til að finna ráðandi liti í listaverkum og smíðaðar litapalletur út frá því. Hins vegar kom kveikjan að því að nota íslenskt myndefni, til að athuga hvort hægt væri að finna *íslenska liti*, við það að heyra að á [OzUnconf 2017](https://github.com/ropensci/ozunconf17) hafi slíkt verið gert fyrir Ástralíu.
+
+Til að framkvæma þetta þurfum við eftirfarandi R-pakka.
+
+```{r load, echo = FALSE}
+library(tidyverse)
+library(jpeg)
+
+```
+
+## Að lesa inn myndir
+
+
+
+```{r pressure, echo=FALSE}
+sedill_5thus <- jpeg::readJPEG(source = "img/5000kr_sedill.jpg")
+dimension    <- dim(sedill_5thus)
+sedill_5thus_rgb <- data.frame(
+  x = rep(1:dimension[2], each = dimension[1]),
+  y = rep(dimension[1]:1, dimension[2]),
+  R = as.vector(sedill_5thus[,,1]), #slicing our array into three
+  G = as.vector(sedill_5thus[,,2]),
+  B = as.vector(sedill_5thus[,,3])
+)
+
+kjarnar <- kmeans(sedill_5thus_rgb[,c("R","G","B")], centers = 32, iter.max = 30)
+library(scales)
+show_col(rgb(kjarnar$centers))
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
